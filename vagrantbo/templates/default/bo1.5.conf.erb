@@ -1,0 +1,36 @@
+<VirtualHost *:80>
+  ServerName <%= @params[:server_name] %>
+
+  <% if @params[:server_aliases] -%>
+  ServerAlias <%= @params[:server_aliases].join " " %>
+  <% end -%>
+
+  DocumentRoot <%= @params[:docroot] %>
+  FileETag MTime Size
+
+  <Directory <%= @params[:docroot] %>>
+    AllowOverride All
+    Options +Includes -ExecCGI +SymLinksIfOwnerMatch
+    Order allow,deny
+    Allow from all
+  </Directory>
+</VirtualHost>
+
+<VirtualHost *:443>
+  ServerName <%= @params[:server_name] %>
+
+  <% if @params[:server_aliases] -%>
+  ServerAlias <%= @params[:server_aliases].join " " %>
+  <% end -%>
+
+  DocumentRoot <%= @params[:docroot] %>
+
+  <%= render 'apache.erb', cookbook: 'ssl_certificate', variables: @params.merge(node: node) %>
+
+  <Directory <%= @params[:docroot] %>>
+    AllowOverride All
+    Options +Includes -ExecCGI +SymLinksIfOwnerMatch
+    Order allow,deny
+    Allow from all
+  </Directory>
+</VirtualHost>
